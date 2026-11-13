@@ -1,6 +1,6 @@
 # SafeWalk API — Rotas mais seguras para quem anda a pé em São Paulo
 
-**Global Solution FIAP 2026.2 · CitizenTech · Engenharia de Software (3ESR) · Disciplina: Arquitetura Orientada a Serviços (SOA) e Web Services**
+**Global Solution FIAP 2026.2 · CitizenTech · Engenharia de Software (3ESPG) · Disciplina: Arquitetura Orientada a Serviços (SOA) e Web Services**
 
 ## Integrantes
 
