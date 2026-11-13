@@ -1,0 +1,27 @@
+# Migrações e seed no PostgreSQL 16 (banco real)
+$ alembic downgrade base && alembic upgrade head
+INFO  [alembic.runtime.migration] Running downgrade 0002 -> 0001, reputacao do usuario
+INFO  [alembic.runtime.migration] Running downgrade 0001 -> , tabelas iniciais do dominio
+INFO  [alembic.runtime.migration] Running upgrade  -> 0001, tabelas iniciais do dominio
+INFO  [alembic.runtime.migration] Running upgrade 0001 -> 0002, reputacao do usuario
+$ python -m app.seed
+Seed concluído. Operador: operador@safewalk.dev / Operador@123 | Cidadão: leo@safewalk.dev / Cidadao@123
+$ alembic check
+No new upgrade operations detected.
+$ psql -d safewalk -c "\dt"
+                List of relations
+ Schema |         Name         | Type  |  Owner   
+--------+----------------------+-------+----------
+ public | alembic_version      | table | safewalk
+ public | cameras              | table | safewalk
+ public | report_confirmations | table | safewalk
+ public | reports              | table | safewalk
+ public | risk_hotspots        | table | safewalk
+ public | sos_alerts           | table | safewalk
+ public | trip_locations       | table | safewalk
+ public | trip_shares          | table | safewalk
+ public | trips                | table | safewalk
+ public | trusted_contacts     | table | safewalk
+ public | users                | table | safewalk
+(11 rows)
+

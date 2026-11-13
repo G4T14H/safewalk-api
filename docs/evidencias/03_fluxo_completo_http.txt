@@ -1,0 +1,283 @@
+### 0. Healthcheck
+{
+    "status": "ok",
+    "service": "safewalk-api"
+}
+### 1. Cadastro e login (cidadã Leo e vizinha Bia)
+{
+    "id": 3,
+    "name": "Leo Demo",
+    "email": "leo18854@safewalk.dev",
+    "role": "citizen",
+    "profile": "default",
+    "has_pin": false,
+    "created_at": "2026-11-10T20:57:35.018945"
+}
+-- login com senha errada:
+{"detail":"Credenciais inválidas"} (HTTP 401)
+### 2. Define PIN do SOS
+HTTP 204
+### 3. Convida contato; só depois de aceitar ele pode acompanhar
+{
+    "id": 1,
+    "name": "Mãe",
+    "phone": "+5511999990000",
+    "status": "pending",
+    "invite_token": "KUaleTbYE_ESHyvxNtfCnaZs4SzvaLHR",
+    "created_at": "2026-11-10T20:57:35.269428",
+    "accepted_at": null
+}
+-- trajeto com contato ainda pendente:
+{"detail":"Contato 1 ainda não aceitou o convite"} (HTTP 400)
+{
+    "id": 1,
+    "name": "Mãe",
+    "phone": "+5511999990000",
+    "status": "accepted",
+    "invite_token": "KUaleTbYE_ESHyvxNtfCnaZs4SzvaLHR",
+    "created_at": "2026-11-10T20:57:35.269428",
+    "accepted_at": "2026-11-10T20:57:35.370716"
+}
+### 4. Relato colaborativo na R. Augusta: criado por Leo, confirmado por Bia
+{
+    "id": 1,
+    "type": "roubo_celular",
+    "lat": -23.556,
+    "lng": -46.66,
+    "details": "dois homens de moto",
+    "weight": 0.3,
+    "confirmation_count": 0,
+    "status": "active",
+    "sp156_protocol": null,
+    "created_at": "2026-11-10T20:57:35.415534",
+    "expires_at": "2026-11-11T02:57:35.414149"
+}
+-- Bia confirma (peso sobe):
+{
+    "id": 1,
+    "type": "roubo_celular",
+    "lat": -23.556,
+    "lng": -46.66,
+    "details": "dois homens de moto",
+    "weight": 0.45,
+    "confirmation_count": 1,
+    "status": "active",
+    "sp156_protocol": null,
+    "created_at": "2026-11-10T20:57:35.415534",
+    "expires_at": "2026-11-11T02:57:35.414149"
+}
+-- Leo tenta confirmar o próprio relato:
+{"detail":"Você não pode confirmar o próprio relato"} (HTTP 400)
+### 5. Score de risco na R. Augusta (23h) com o relato ativo
+{
+    "lat": -23.556,
+    "lng": -46.66,
+    "hour": 23,
+    "score": 0.898,
+    "level": "high",
+    "reasons": [
+        "Histórico de ocorrências nesta região e horário",
+        "Roubo de celular relatado",
+        "1 câmera(s) monitorando o trecho"
+    ]
+}
+### 5b. Compara rota rápida x segura (FIAP -> Frei Caneca), horário local 2026-11-10T17:57:34
+{
+  "fast": {
+    "kind": "fast",
+    "distance_m": 1290.2,
+    "duration_min": 16.1,
+    "risk_score": 0.088,
+    "risk_level": "low",
+    "reasons": [
+      "1 câmera(s) monitorando o trecho",
+      "Iluminação fraca"
+    ],
+    "polyline": "[10 pontos]"
+  },
+  "safe": {
+    "kind": "safe",
+    "distance_m": 1333.4,
+    "duration_min": 16.7,
+    "risk_score": 0.031,
+    "risk_level": "low",
+    "reasons": [
+      "1 câmera(s) monitorando o trecho",
+      "Iluminação fraca"
+    ],
+    "polyline": "[10 pontos]"
+  },
+  "time_difference_min": 0.6,
+  "risk_reduction_pct": 64.8
+}
+### 6. Inicia trajeto acompanhado pela rota segura
+{
+  "id": 1,
+  "route_type": "safe",
+  "risk_score": 0.031,
+  "risk_level": "low",
+  "distance_m": 1333.4,
+  "duration_min": 16.7,
+  "status": "active",
+  "started_at": "2026-11-10T20:57:35.632811",
+  "ended_at": null,
+  "polyline": "[10 pontos]",
+  "shares": [
+    {
+      "contact_id": 1,
+      "token": "n6PUJWFvaV1M9ULqG8L5CrXRD2E_WyTp",
+      "url": "/public/track/n6PUJWFvaV1M9ULqG8L5CrXRD2E_WyTp"
+    }
+  ]
+}
+### 7. Envia localização e o contato abre o link público (sem login)
+{
+    "recorded": true,
+    "anomaly": null
+}
+{
+  "traveler": "Leo",
+  "status": "active",
+  "risk_level": "low",
+  "started_at": "2026-11-10T20:57:35.632811",
+  "last_location": {
+    "lat": -23.564,
+    "lng": -46.6527
+  },
+  "polyline": "[10 pontos]",
+  "message": "A caminho"
+}
+-- posição longe da rota (desvio):
+{
+    "recorded": true,
+    "anomaly": {
+        "trigger": "auto_deviation",
+        "message": "Desvio de 5191 m da rota planejada"
+    }
+}
+### 8. SOS automático por desvio: pergunta -> escalada -> cancelamento com PIN
+{
+    "id": 1,
+    "status": "asking",
+    "trigger": "auto_deviation",
+    "lat": -23.564,
+    "lng": -46.6527,
+    "gcm_protocol": null,
+    "created_at": "2026-11-10T20:57:35.833350",
+    "timeline": [
+        {
+            "event": "Pergunta 'Tudo bem?' enviada",
+            "at": "2026-11-10T20:57:35.833350"
+        }
+    ]
+}
+-- escala para contatos:
+{
+    "id": 1,
+    "status": "contacts_notified",
+    "trigger": "auto_deviation",
+    "lat": -23.564,
+    "lng": -46.6527,
+    "gcm_protocol": null,
+    "created_at": "2026-11-10T20:57:35.833350",
+    "timeline": [
+        {
+            "event": "Pergunta 'Tudo bem?' enviada",
+            "at": "2026-11-10T20:57:35.833350"
+        },
+        {
+            "event": "Contatos receberam a localização",
+            "at": "2026-11-10T20:57:35.912694"
+        }
+    ]
+}
+-- cancelar com PIN errado:
+{"detail":"PIN incorreto"} (HTTP 403)
+-- cancelar com PIN correto:
+{
+    "id": 1,
+    "status": "cancelled",
+    "trigger": "auto_deviation",
+    "lat": -23.564,
+    "lng": -46.6527,
+    "gcm_protocol": null,
+    "created_at": "2026-11-10T20:57:35.833350",
+    "timeline": [
+        {
+            "event": "Pergunta 'Tudo bem?' enviada",
+            "at": "2026-11-10T20:57:35.833350"
+        },
+        {
+            "event": "Contatos receberam a localização",
+            "at": "2026-11-10T20:57:35.912694"
+        },
+        {
+            "event": "Cancelado com PIN",
+            "at": "2026-11-10T20:57:36.037113"
+        }
+    ]
+}
+### 9. Finaliza trajeto; link do contato mostra chegada
+{
+  "id": 1,
+  "route_type": "safe",
+  "risk_score": 0.031,
+  "risk_level": "low",
+  "distance_m": 1333.4,
+  "duration_min": 16.7,
+  "status": "completed",
+  "started_at": "2026-11-10T20:57:35.632811",
+  "ended_at": "2026-11-10T20:57:36.066457",
+  "polyline": "[10 pontos]",
+  "shares": [
+    {
+      "contact_id": 1,
+      "token": "n6PUJWFvaV1M9ULqG8L5CrXRD2E_WyTp",
+      "url": "/public/track/n6PUJWFvaV1M9ULqG8L5CrXRD2E_WyTp"
+    }
+  ]
+}
+{
+  "traveler": "Leo",
+  "status": "completed",
+  "risk_level": "low",
+  "started_at": "2026-11-10T20:57:35.632811",
+  "last_location": {
+    "lat": -23.59,
+    "lng": -46.61
+  },
+  "polyline": "[10 pontos]",
+  "message": "Chegou ao destino em segurança"
+}
+### 10. Painel da Prefeitura (operador) e bloqueio para cidadão
+{
+    "period_days": 7,
+    "reports_received": 1,
+    "sos_confirmed": 0,
+    "sp156_open": 0,
+    "cameras_registered": 5,
+    "critical_points": [
+        {
+            "lat": -23.556,
+            "lng": -46.66,
+            "reports": 1,
+            "predominant_type": "roubo_celular"
+        }
+    ]
+}
+-- cidadão no painel:
+{"detail":"Acesso restrito a operadores da Prefeitura/GCM"} (HTTP 403)
+-- operador marca o relato como falso (reputação do autor cai):
+{
+    "id": 1,
+    "type": "roubo_celular",
+    "lat": -23.556,
+    "lng": -46.66,
+    "details": "dois homens de moto",
+    "weight": 0.45,
+    "confirmation_count": 1,
+    "status": "false_report",
+    "sp156_protocol": null,
+    "created_at": "2026-11-10T20:57:35.415534",
+    "expires_at": "2026-11-11T02:57:35.414149"
+}
