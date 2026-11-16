@@ -12,10 +12,9 @@ import app.domain.models  # noqa: F401
 from app.database import Base, get_db
 from app.deps import reset_rate_limit
 from app.domain.enums import UserRole
-from app.domain.models import User
+from app.domain.models import Camera, RiskHotspot, User
 from app.main import app
 from app.seed import CAMERAS, HOTSPOTS
-from app.domain.models import Camera, RiskHotspot
 from app.security import hash_secret
 
 # Pontos de teste (região Bela Vista/Consolação)
