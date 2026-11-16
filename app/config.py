@@ -1,5 +1,20 @@
 """Configurações da aplicação (lidas de variáveis de ambiente)."""
 import os
+from pathlib import Path
+
+
+def _load_dotenv(path: Path = Path(__file__).resolve().parent.parent / ".env") -> None:
+    """Carrega o arquivo .env (se existir) sem sobrescrever variáveis já definidas no ambiente."""
+    if not path.is_file():
+        return
+    for line in path.read_text(encoding="utf-8").splitlines():
+        line = line.strip()
+        if line and not line.startswith("#") and "=" in line:
+            key, value = line.split("=", 1)
+            os.environ.setdefault(key.strip(), value.strip().strip("\"'"))
+
+
+_load_dotenv()
 
 
 class Settings:
