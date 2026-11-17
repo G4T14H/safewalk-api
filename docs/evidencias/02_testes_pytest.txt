@@ -1,48 +1,101 @@
-tests/test_auth.py::test_register_and_login PASSED
-tests/test_auth.py::test_duplicate_email_conflict PASSED
-tests/test_auth.py::test_wrong_password_and_invalid_token PASSED
-tests/test_auth.py::test_validation_errors PASSED
-tests/test_auth.py::test_profile_and_pin PASSED
-tests/test_auth.py::test_rate_limit PASSED
-tests/test_city_migrations.py::test_dashboard_is_operator_only PASSED
-tests/test_city_migrations.py::test_dashboard_aggregates PASSED
-tests/test_city_migrations.py::test_cameras PASSED
-tests/test_city_migrations.py::test_health_and_openapi PASSED
-tests/test_city_migrations.py::test_alembic_migrations_upgrade_and_downgrade PASSED
-tests/test_reports.py::test_create_report_is_anonymous_and_low_weight PASSED
-tests/test_reports.py::test_infra_report_gets_sp156_protocol_and_no_expiry PASSED
-tests/test_reports.py::test_confirmation_raises_weight_and_blocks_abuse PASSED
-tests/test_reports.py::test_duplicate_report_rejected PASSED
-tests/test_reports.py::test_spam_limit PASSED
-tests/test_reports.py::test_nearby_and_expiry PASSED
-tests/test_reports.py::test_report_raises_route_risk PASSED
-tests/test_reports.py::test_operator_resolves_and_flags_false PASSED
-tests/test_reports.py::test_author_can_delete_only_own PASSED
-tests/test_risk_routes.py::test_haversine_known_distance PASSED
-tests/test_risk_routes.py::test_night_is_riskier_than_day PASSED
-tests/test_risk_routes.py::test_cameras_reduce_risk PASSED
-tests/test_risk_routes.py::test_compare_endpoint_safe_never_worse PASSED
-tests/test_risk_routes.py::test_compare_requires_auth_and_validates PASSED
-tests/test_risk_routes.py::test_risk_score_endpoint PASSED
-tests/test_risk_routes.py::test_elderly_profile_penalises_infra PASSED
-tests/test_time_and_misc.py::test_to_naive_utc_and_local_hour PASSED
-tests/test_time_and_misc.py::test_location_with_offset_is_stored_as_utc PASSED
-tests/test_time_and_misc.py::test_compare_converts_depart_at_timezone PASSED
-tests/test_time_and_misc.py::test_same_origin_and_destination PASSED
-tests/test_time_and_misc.py::test_contacts_delete_and_ownership PASSED
-tests/test_time_and_misc.py::test_list_sos_alerts PASSED
-tests/test_trips_sos.py::test_pending_contact_cannot_follow PASSED
-tests/test_trips_sos.py::test_invalid_invite_token PASSED
-tests/test_trips_sos.py::test_full_trip_flow_with_public_link PASSED
-tests/test_trips_sos.py::test_link_expires_after_arrival_window PASSED
-tests/test_trips_sos.py::test_only_one_active_trip_and_ownership PASSED
-tests/test_trips_sos.py::test_deviation_detected PASSED
-tests/test_trips_sos.py::test_unexpected_stop_detected PASSED
-tests/test_trips_sos.py::test_abrupt_motion_detected PASSED
-tests/test_trips_sos.py::test_normal_walk_has_no_anomaly PASSED
-tests/test_trips_sos.py::test_button_sos_notifies_contacts_immediately PASSED
-tests/test_trips_sos.py::test_auto_sos_asks_first_then_escalates_by_time PASSED
-tests/test_trips_sos.py::test_manual_escalation_chain PASSED
-tests/test_trips_sos.py::test_only_correct_pin_cancels PASSED
-tests/test_trips_sos.py::test_sos_isolation_between_users PASSED
-======================== 47 passed, 1 warning in 6.63s =========================
+Execução em 2026-11-17
+Comando: python -m pytest --cov=app --cov-report=term-missing -v
+Ambiente: Windows, Python 3.13.3, pytest 9.2.0, pytest-cov 7.1.0
+
+============================= test session starts =============================
+platform win32 -- Python 3.13.3, pytest-9.2.0, pluggy-1.7.0 -- C:\Users\gabri\OneDrive\Documentos\SafeWalk\_safewalk_pr_worktree\.venv\Scripts\python.exe
+cachedir: .pytest_cache
+rootdir: C:\Users\gabri\OneDrive\Documentos\SafeWalk\_safewalk_pr_worktree
+configfile: pytest.ini
+testpaths: tests
+plugins: anyio-4.16.0, cov-7.1.0
+collecting ... collected 48 items
+
+tests/test_auth.py::test_register_and_login PASSED                       [  2%]
+tests/test_auth.py::test_duplicate_email_conflict PASSED                 [  4%]
+tests/test_auth.py::test_wrong_password_and_invalid_token PASSED         [  6%]
+tests/test_auth.py::test_validation_errors PASSED                        [  8%]
+tests/test_auth.py::test_profile_and_pin PASSED                          [ 10%]
+tests/test_auth.py::test_rate_limit PASSED                               [ 12%]
+tests/test_city_migrations.py::test_dashboard_is_operator_only PASSED    [ 14%]
+tests/test_city_migrations.py::test_dashboard_aggregates PASSED          [ 16%]
+tests/test_city_migrations.py::test_cameras PASSED                       [ 18%]
+tests/test_city_migrations.py::test_health_and_openapi PASSED            [ 20%]
+tests/test_city_migrations.py::test_alembic_migrations_upgrade_and_downgrade PASSED [ 22%]
+tests/test_reports.py::test_create_report_is_anonymous_and_low_weight PASSED [ 25%]
+tests/test_reports.py::test_infra_report_gets_sp156_protocol_and_no_expiry PASSED [ 27%]
+tests/test_reports.py::test_confirmation_raises_weight_and_blocks_abuse PASSED [ 29%]
+tests/test_reports.py::test_duplicate_report_rejected PASSED             [ 31%]
+tests/test_reports.py::test_spam_limit PASSED                            [ 33%]
+tests/test_reports.py::test_nearby_and_expiry PASSED                     [ 35%]
+tests/test_reports.py::test_report_raises_route_risk PASSED              [ 37%]
+tests/test_reports.py::test_operator_resolves_and_flags_false PASSED     [ 39%]
+tests/test_reports.py::test_author_can_delete_only_own PASSED            [ 41%]
+tests/test_risk_routes.py::test_haversine_known_distance PASSED          [ 43%]
+tests/test_risk_routes.py::test_night_is_riskier_than_day PASSED         [ 45%]
+tests/test_risk_routes.py::test_cameras_reduce_risk PASSED               [ 47%]
+tests/test_risk_routes.py::test_compare_endpoint_safe_never_worse PASSED [ 50%]
+tests/test_risk_routes.py::test_compare_requires_auth_and_validates PASSED [ 52%]
+tests/test_risk_routes.py::test_risk_score_endpoint PASSED               [ 54%]
+tests/test_risk_routes.py::test_elderly_profile_penalises_infra PASSED   [ 56%]
+tests/test_time_and_misc.py::test_to_naive_utc_and_local_hour PASSED     [ 58%]
+tests/test_time_and_misc.py::test_location_with_offset_is_stored_as_utc PASSED [ 60%]
+tests/test_time_and_misc.py::test_compare_converts_depart_at_timezone PASSED [ 62%]
+tests/test_time_and_misc.py::test_same_origin_and_destination PASSED     [ 64%]
+tests/test_time_and_misc.py::test_contacts_delete_and_ownership PASSED   [ 66%]
+tests/test_time_and_misc.py::test_list_sos_alerts PASSED                 [ 68%]
+tests/test_trips_sos.py::test_pending_contact_cannot_follow PASSED       [ 70%]
+tests/test_trips_sos.py::test_invalid_invite_token PASSED                [ 72%]
+tests/test_trips_sos.py::test_full_trip_flow_with_public_link PASSED     [ 75%]
+tests/test_trips_sos.py::test_link_expires_after_arrival_window PASSED   [ 77%]
+tests/test_trips_sos.py::test_only_one_active_trip_and_ownership PASSED  [ 79%]
+tests/test_trips_sos.py::test_deviation_detected PASSED                  [ 81%]
+tests/test_trips_sos.py::test_anomaly_location_creates_and_reuses_sos_alert PASSED [ 83%]
+tests/test_trips_sos.py::test_unexpected_stop_detected PASSED            [ 85%]
+tests/test_trips_sos.py::test_abrupt_motion_detected PASSED              [ 87%]
+tests/test_trips_sos.py::test_normal_walk_has_no_anomaly PASSED          [ 89%]
+tests/test_trips_sos.py::test_button_sos_notifies_contacts_immediately PASSED [ 91%]
+tests/test_trips_sos.py::test_auto_sos_asks_first_then_escalates_by_time PASSED [ 93%]
+tests/test_trips_sos.py::test_manual_escalation_chain PASSED             [ 95%]
+tests/test_trips_sos.py::test_only_correct_pin_cancels PASSED            [ 97%]
+tests/test_trips_sos.py::test_sos_isolation_between_users PASSED         [100%]
+
+=============================== tests coverage ================================
+_______________ coverage: platform win32, python 3.13.3-final-0 _______________
+
+Name                              Stmts   Miss  Cover   Missing
+---------------------------------------------------------------
+app\__init__.py                       0      0   100%
+app\config.py                        35      7    80%   11-15, 25, 34
+app\database.py                      13      4    69%   17-21
+app\deps.py                          43      1    98%   55
+app\domain\__init__.py                0      0   100%
+app\domain\enums.py                  53      0   100%
+app\domain\models.py                130      0   100%
+app\main.py                           9      0   100%
+app\routers\__init__.py               0      0   100%
+app\routers\auth.py                  25      0   100%
+app\routers\city.py                  16      0   100%
+app\routers\contacts.py              20      0   100%
+app\routers\reports.py               23      0   100%
+app\routers\routes.py                29      0   100%
+app\routers\sos.py                   27      0   100%
+app\routers\trips.py                 35      1    97%   36
+app\schemas.py                      165      0   100%
+app\security.py                      23      0   100%
+app\seed.py                          25     15    40%   33-49, 53
+app\services\__init__.py              0      0   100%
+app\services\anomaly_service.py      24      1    96%   15
+app\services\auth_service.py         30      1    97%   30
+app\services\city_service.py         27      0   100%
+app\services\contact_service.py      29      0   100%
+app\services\errors.py                5      0   100%
+app\services\geo.py                  26      2    92%   25, 33
+app\services\report_service.py       96      4    96%   30, 90, 99, 111
+app\services\risk_service.py        109      5    95%   35, 37, 48, 82, 100
+app\services\sos_service.py          95      1    99%   104
+app\services\timeutil.py             13      0   100%
+app\services\trip_service.py         84      2    98%   52, 100
+---------------------------------------------------------------
+TOTAL                              1209     44    96%
+============================= 48 passed in 20.98s =============================
