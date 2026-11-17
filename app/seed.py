@@ -6,6 +6,7 @@ Os hotspots são dados SIMULADOS, inspirados nas categorias das bases oficiais
 from sqlalchemy import select
 
 from app.database import SessionLocal
+from app.config import settings
 from app.domain.enums import CameraSource, UserRole
 from app.domain.models import Camera, RiskHotspot, User
 from app.security import hash_secret
@@ -30,18 +31,22 @@ CAMERAS = [  # Smart Sampa (mock)
 
 def run() -> None:
     with SessionLocal() as db:
-        if not db.scalar(select(User).where(User.email == "operador@safewalk.dev")):
-            db.add(User(name="Operador Prefeitura", email="operador@safewalk.dev",
-                        password_hash=hash_secret("Operador@123"), role=UserRole.operator))
-        if not db.scalar(select(User).where(User.email == "leo@safewalk.dev")):
-            db.add(User(name="Leo Demo", email="leo@safewalk.dev", password_hash=hash_secret("Cidadao@123")))
+        if settings.SEED_DEMO_USERS:
+            if not db.scalar(select(User).where(User.email == "operador@safewalk.dev")):
+                db.add(User(name="Operador Prefeitura", email="operador@safewalk.dev",
+                            password_hash=hash_secret("Operador@123"), role=UserRole.operator))
+            if not db.scalar(select(User).where(User.email == "leo@safewalk.dev")):
+                db.add(User(name="Leo Demo", email="leo@safewalk.dev", password_hash=hash_secret("Cidadao@123")))
         if not db.scalar(select(RiskHotspot)):
             db.add_all(RiskHotspot(name=n, lat=la, lng=ln, radius_m=r, base_risk=b, lighting_ok=li, source=s)
                        for n, la, ln, r, b, li, s in HOTSPOTS)
         if not db.scalar(select(Camera)):
             db.add_all(Camera(name=n, lat=la, lng=ln, source=s) for n, la, ln, s in CAMERAS)
         db.commit()
-    print("Seed concluído. Operador: operador@safewalk.dev / Operador@123 | Cidadão: leo@safewalk.dev / Cidadao@123")
+    if settings.SEED_DEMO_USERS:
+        print("Seed concluído. Usuários de demonstração habilitados (somente desenvolvimento).")
+    else:
+        print("Seed concluído. Dados de demonstração carregados; usuários de demonstração desabilitados.")
 
 
 if __name__ == "__main__":

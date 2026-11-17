@@ -2,7 +2,7 @@
   "openapi": "3.1.0",
   "info": {
     "title": "SafeWalk API",
-    "description": "\nBackend do **SafeWalk**: rotas mais seguras para quem anda a pé em São Paulo.\n\n* **Rotas**: compara a rota mais rápida com a mais segura e explica o risco de cada trecho.\n* **Acompanhamento**: contatos veem a localização por link (com consentimento), sem instalar nada.\n* **SOS**: escalada por etapas (pergunta → contatos → central da GCM); só o PIN cancela.\n* **Relatos colaborativos**: peso progressivo, validade por tipo e antiabuso.\n* **Painel da Prefeitura**: visão B2G de relatos, SOS e chamados SP156.\n\nIntegrações Smart Sampa, GCM e SP156 são **simuladas** nesta entrega.\nUse **Authorize** (e-mail como `username`) para testar os endpoints protegidos.\n",
+    "description": "Backend do **SafeWalk**: rotas mais seguras para quem anda a pé em São Paulo.\n\n* **Rotas**: compara a rota mais rápida com a mais segura e explica o risco de cada trecho.\n* **Acompanhamento**: contatos veem a localização por link (com consentimento), sem instalar nada.\n* **Anomalias**: uma parada, um desvio ou um movimento brusco detectado abre um alerta SOS e retorna seu identificador.\n* **SOS**: escalada por etapas (pergunta → contatos → central da GCM); só o PIN cancela.\n* **Relatos colaborativos**: peso progressivo, validade por tipo e antiabuso.\n* **Painel da Prefeitura**: visão B2G de relatos, SOS e chamados SP156.\n\nIntegrações Smart Sampa, GCM e SP156 são **simuladas** nesta entrega.\nUse **Authorize** (e-mail como `username`) para testar os endpoints protegidos.\n",
     "contact": {
       "name": "Equipe SafeWalk — FIAP 3ESR"
     },
@@ -608,7 +608,7 @@
         "tags": [
           "Trajetos e acompanhamento"
         ],
-        "summary": "Registra a posição e detecta parada, desvio ou movimento brusco",
+        "summary": "Registra a posição, detecta anomalias e abre um SOS quando necessário",
         "operationId": "add_location_trips__trip_id__locations_post",
         "security": [
           {
@@ -1796,6 +1796,29 @@
                 "type": "null"
               }
             ]
+          },
+          "sos_alert_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sos Alert Id",
+            "description": "Alerta criado automaticamente quando uma anomalia é detectada"
+          },
+          "sos_status": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/SOSStatus"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sos Status"
           }
         },
         "type": "object",
