@@ -76,6 +76,26 @@ def test_deviation_detected(client, auth):
     assert ack["anomaly"]["trigger"] == "auto_deviation"
 
 
+def test_anomaly_location_creates_and_reuses_sos_alert(client, auth):
+    trip = _start_trip(client, auth).json()
+    far = {"lat": FIAP["lat"] - 0.02, "lng": FIAP["lng"] + 0.02}
+
+    first = client.post(f"/trips/{trip['id']}/locations", json=far, headers=auth).json()
+
+    assert first["anomaly"]["trigger"] == "auto_deviation"
+    assert first["sos_alert_id"] is not None
+    assert first["sos_status"] == "asking"
+
+    alert = client.get(f"/sos/{first['sos_alert_id']}", headers=auth)
+    assert alert.status_code == 200
+    assert alert.json()["trigger"] == "auto_deviation"
+    assert alert.json()["status"] == "asking"
+
+    repeated = client.post(f"/trips/{trip['id']}/locations", json=far, headers=auth).json()
+    assert repeated["anomaly"]["trigger"] == "auto_deviation"
+    assert repeated["sos_alert_id"] == first["sos_alert_id"]
+
+
 def test_unexpected_stop_detected(client, auth):
     trip = _start_trip(client, auth).json()
     p0 = trip["polyline"][0]
