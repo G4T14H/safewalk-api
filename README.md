@@ -34,7 +34,7 @@
 | **Conexão com banco de dados (3,0)** | SQLAlchemy 2.0 (`app/database.py`). SQLite por padrão e **PostgreSQL** via `DATABASE_URL` (`docker-compose.yml`). Sessão por requisição (`get_db`), FKs com `ON DELETE`, índices, `UNIQUE` (ex.: uma confirmação por usuário/relato). |
 | **Migrações (1,5)** | Alembic: `alembic/versions/0001_tabelas_iniciais_do_dominio.py` (10 tabelas) e `0002_reputacao_do_usuario.py` (evolução do domínio). `alembic check` sem divergências; upgrade e downgrade testados. |
 | **Documentação automática (1,5)** | Swagger UI em **`/docs`**, ReDoc em `/redoc`, OpenAPI em `/openapi.json` (cópia em `docs/openapi.json`: 25 paths / 31 operações, todos com resumo e esquemas). Botão **Authorize** funcional (OAuth2 + JWT). |
-| **Testes automatizados (1,0)** | `pytest` — **47 testes** (`tests/`, **97% de cobertura** do código da API), banco SQLite em memória isolado por teste. Inclui teste de migração (upgrade/downgrade). |
+| **Testes automatizados (1,0)** | `pytest` — **48 testes** (`tests/`, **96% de cobertura** de `app/` na execução registrada), banco SQLite em memória isolado por teste. Inclui teste de migração (upgrade/downgrade) e teste de integração do SOS automático por anomalia. |
 
 ## Arquitetura
 
@@ -147,11 +147,11 @@ No Swagger: **Authorize** → `username` = e-mail, `password` = senha.
 | Arquivo | Conteúdo |
 |---|---|
 | `docs/evidencias/01_migracoes_e_seed.txt` | Migrações (downgrade base → upgrade head), seed e `alembic check` executados em **PostgreSQL 16 real**, com a listagem das 10 tabelas do domínio (+ `alembic_version`, controle do Alembic) |
-| `docs/evidencias/02_testes_pytest.txt` | Saída do `pytest -v`: 47 testes passando |
+| `docs/evidencias/02_testes_pytest.txt` | Execução registrada de `pytest --cov=app --cov-report=term-missing -v`: 48 testes passando e 96% de cobertura |
 | `docs/evidencias/03_fluxo_completo_http.txt` | Snapshot histórico de fluxo HTTP com tokens redigidos. O script `docs/evidencias/fluxo_http.sh` foi atualizado para demonstrar a criação automática do SOS após uma anomalia; regenere o snapshot para capturar o novo campo `sos_alert_id`. |
 | `docs/evidencias/fluxo_http.sh` | Script que reproduz esse fluxo: `bash docs/evidencias/fluxo_http.sh` com a API no ar |
 | `docs/openapi.json` | Especificação OpenAPI gerada automaticamente |
-| `docs/prints/` | Prints da aplicação rodando (Swagger, comparação de rotas, SOS, painel da Prefeitura e os 47 testes) |
+| `docs/prints/` | Prints da aplicação rodando (Swagger, comparação de rotas, SOS, painel da Prefeitura e captura histórica da execução dos 47 testes) |
 
 
 ### Prints da aplicação rodando
@@ -172,7 +172,7 @@ No Swagger: **Authorize** → `username` = e-mail, `password` = senha.
 
 ![Painel da Prefeitura](docs/prints/04_painel_prefeitura_200.png)
 
-**`pytest -v`: 47 testes passando**
+**Captura histórica do `pytest -v`: 47 testes. O resultado atualizado (48 testes, 96% de cobertura) está em `docs/evidencias/02_testes_pytest.txt`.**
 
 ![Testes](docs/prints/05_pytest_47_passed.png)
 
