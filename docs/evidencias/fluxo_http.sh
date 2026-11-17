@@ -1,14 +1,8 @@
 #!/usr/bin/env bash
 # Fluxo completo da API via HTTP (requer a API em http://localhost:8000 e o seed aplicado).
 B=${BASE_URL:-http://localhost:8000}
-j(){ python3 -m json.tool --no-ensure-ascii; }
-short(){ python3 -c "
-import sys,json; d=json.load(sys.stdin)
-def cut(o):
-    if isinstance(o,dict): return {k:(f'[{len(v)} pontos]' if k=='polyline' else cut(v)) for k,v in o.items()}
-    if isinstance(o,list): return [cut(x) for x in o]
-    return o
-print(json.dumps(cut(d),indent=2,ensure_ascii=False))"; }
+j(){ python3 docs/evidencias/sanitizar_json.py; }
+short(){ python3 docs/evidencias/sanitizar_json.py --compact-polyline; }
 get(){ python3 -c "import sys,json;print(json.load(sys.stdin)$1)"; }
 SUF=$RANDOM
 HOUR=$(date -u -d '-3 hours' +%Y-%m-%dT%H:%M:%S)   # horário local de São Paulo
@@ -44,10 +38,11 @@ TID=$(echo "$TR" | get "['id']"); STOK=$(echo "$TR" | get "['shares'][0]['token'
 echo "### 7. Envia localização e o contato abre o link público (sem login)"
 curl -s -X POST $B/trips/$TID/locations -H "$H" -H "$J" -d '{"lat":-23.5640,"lng":-46.6527}' | j
 curl -s $B/public/track/$STOK | short
-echo "-- posição longe da rota (desvio):"; curl -s -X POST $B/trips/$TID/locations -H "$H" -H "$J" -d '{"lat":-23.5900,"lng":-46.6100}' | j
-echo "### 8. SOS automático por desvio: pergunta -> escalada -> cancelamento com PIN"
-S=$(curl -s -X POST $B/sos -H "$H" -H "$J" -d "{\"lat\":-23.5640,\"lng\":-46.6527,\"trigger\":\"auto_deviation\",\"trip_id\":$TID}"); echo "$S" | j
-SID=$(echo "$S" | get "['id']")
+echo "-- posição longe da rota (desvio e criação automática do SOS):"
+A=$(curl -s -X POST $B/trips/$TID/locations -H "$H" -H "$J" -d '{"lat":-23.5900,"lng":-46.6100}'); echo "$A" | j
+SID=$(echo "$A" | get "['sos_alert_id']")
+echo "### 8. SOS aberto pela anomalia; avanço demonstrativo e cancelamento com PIN"
+S=$(curl -s $B/sos/$SID -H "$H"); echo "$S" | j
 echo "-- escala para contatos:"; curl -s -X POST $B/sos/$SID/escalate -H "$H" | j
 echo "-- cancelar com PIN errado:"; curl -s -w " (HTTP %{http_code})\n" -X POST $B/sos/$SID/cancel -H "$H" -H "$J" -d '{"pin":"0000"}'
 echo "-- cancelar com PIN correto:"; curl -s -X POST $B/sos/$SID/cancel -H "$H" -H "$J" -d '{"pin":"4821"}' | j

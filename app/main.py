@@ -8,6 +8,7 @@ Backend do **SafeWalk**: rotas mais seguras para quem anda a pé em São Paulo.
 
 * **Rotas**: compara a rota mais rápida com a mais segura e explica o risco de cada trecho.
 * **Acompanhamento**: contatos veem a localização por link (com consentimento), sem instalar nada.
+* **Anomalias**: uma parada, um desvio ou um movimento brusco detectado abre um alerta SOS e retorna seu identificador.
 * **SOS**: escalada por etapas (pergunta → contatos → central da GCM); só o PIN cancela.
 * **Relatos colaborativos**: peso progressivo, validade por tipo e antiabuso.
 * **Painel da Prefeitura**: visão B2G de relatos, SOS e chamados SP156.

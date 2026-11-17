@@ -12,6 +12,7 @@ from app.database import get_db
 from app.domain.enums import UserRole
 from app.domain.models import User
 from app.security import decode_token
+from app.services.errors import ServiceError
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
 
@@ -32,6 +33,14 @@ def require_operator(user: User = Depends(get_current_user)) -> User:
     if user.role != UserRole.operator:
         raise HTTPException(status.HTTP_403_FORBIDDEN, "Acesso restrito a operadores da Prefeitura/GCM")
     return user
+
+
+def call_service(operation, *args, **kwargs):
+    """Translate application-service errors into the endpoint's HTTP contract."""
+    try:
+        return operation(*args, **kwargs)
+    except ServiceError as exc:
+        raise HTTPException(status_code=exc.status_code, detail=exc.detail) from exc
 
 
 _hits: dict[str, deque] = defaultdict(deque)
