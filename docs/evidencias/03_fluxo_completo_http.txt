@@ -1,3 +1,7 @@
+# Snapshot histórico da demonstração. Tokens foram redigidos. O fluxo de anomalia/SOS foi atualizado no script
+# `fluxo_http.sh`; este registro foi capturado antes de a localização abrir o SOS automaticamente e deve ser
+# regenerado para documentar a nova resposta de `POST /trips/{id}/locations`.
+
 ### 0. Healthcheck
 {
     "status": "ok",
@@ -23,7 +27,7 @@ HTTP 204
     "name": "Mãe",
     "phone": "+5511999990000",
     "status": "pending",
-    "invite_token": "KUaleTbYE_ESHyvxNtfCnaZs4SzvaLHR",
+    "invite_token": "[REDACTED]",
     "created_at": "2026-11-10T20:57:35.269428",
     "accepted_at": null
 }
@@ -34,7 +38,7 @@ HTTP 204
     "name": "Mãe",
     "phone": "+5511999990000",
     "status": "accepted",
-    "invite_token": "KUaleTbYE_ESHyvxNtfCnaZs4SzvaLHR",
+    "invite_token": "[REDACTED]",
     "created_at": "2026-11-10T20:57:35.269428",
     "accepted_at": "2026-11-10T20:57:35.370716"
 }
@@ -125,8 +129,8 @@ HTTP 204
   "shares": [
     {
       "contact_id": 1,
-      "token": "n6PUJWFvaV1M9ULqG8L5CrXRD2E_WyTp",
-      "url": "/public/track/n6PUJWFvaV1M9ULqG8L5CrXRD2E_WyTp"
+      "token": "[REDACTED]",
+      "url": "[REDACTED]"
     }
   ]
 }
@@ -232,8 +236,8 @@ HTTP 204
   "shares": [
     {
       "contact_id": 1,
-      "token": "n6PUJWFvaV1M9ULqG8L5CrXRD2E_WyTp",
-      "url": "/public/track/n6PUJWFvaV1M9ULqG8L5CrXRD2E_WyTp"
+      "token": "[REDACTED]",
+      "url": "[REDACTED]"
     }
   ]
 }

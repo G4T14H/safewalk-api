@@ -147,6 +147,8 @@ class AnomalyOut(BaseModel):
 class LocationAck(BaseModel):
     recorded: bool = True
     anomaly: Optional[AnomalyOut] = None
+    sos_alert_id: Optional[int] = Field(default=None, description="Alerta criado automaticamente quando uma anomalia é detectada")
+    sos_status: Optional[SOSStatus] = None
 
 
 class PublicTrackOut(BaseModel):

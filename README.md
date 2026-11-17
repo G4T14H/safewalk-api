@@ -30,7 +30,7 @@
 
 | Critério (pontos) | Onde está |
 |---|---|
-| **Estruturação do domínio (3,0)** | `app/domain/` (enums + 10 entidades com relacionamentos e regras), `app/services/` (regras puras: risco, rotas, anomalias, relatos, SOS), `app/routers/` (camada REST), `app/schemas.py` (contratos). Separação em camadas, sem regra de negócio nos controllers. |
+| **Estruturação do domínio (3,0)** | `app/domain/` (enums + 10 entidades e relacionamentos), `app/services/` (regras de risco, rotas, anomalias, relatos, trajetos, SOS e painel), `app/routers/` (adaptação HTTP) e `app/schemas.py` (contratos). Os routers mantêm a orquestração e a tradução de erros para HTTP; as regras principais ficam nos serviços. |
 | **Conexão com banco de dados (3,0)** | SQLAlchemy 2.0 (`app/database.py`). SQLite por padrão e **PostgreSQL** via `DATABASE_URL` (`docker-compose.yml`). Sessão por requisição (`get_db`), FKs com `ON DELETE`, índices, `UNIQUE` (ex.: uma confirmação por usuário/relato). |
 | **Migrações (1,5)** | Alembic: `alembic/versions/0001_tabelas_iniciais_do_dominio.py` (10 tabelas) e `0002_reputacao_do_usuario.py` (evolução do domínio). `alembic check` sem divergências; upgrade e downgrade testados. |
 | **Documentação automática (1,5)** | Swagger UI em **`/docs`**, ReDoc em `/redoc`, OpenAPI em `/openapi.json` (cópia em `docs/openapi.json`: 25 paths / 31 operações, todos com resumo e esquemas). Botão **Authorize** funcional (OAuth2 + JWT). |
@@ -56,13 +56,14 @@
 - **Rota rápida × segura**: a rápida é a linha reta; a segura é o candidato de menor risco entre desvios laterais, limitado a 1,6× o tempo da rápida. A resposta traz o **motivo do risco**, a diferença de tempo e a redução de risco (%).
 - **Acompanhamento**: o contato só recebe link depois de **aceitar o convite**; o link é público (sem login), mostra só o último ponto e **expira** quando o trajeto termina (janela de 10 min só para a confirmação de chegada → depois `410 Gone`).
 - **Anomalias**: parada ≥ 60 s no mesmo ponto, desvio > 150 m da rota, velocidade > 8 m/s.
+- **SOS por anomalia**: ao registrar uma posição que detecta uma anomalia, a API cria o alerta SOS na etapa `asking` e devolve `sos_alert_id` e `sos_status` em `POST /trips/{id}/locations`. Um alerta ativo por trajeto evita duplicações em atualizações seguintes.
 - **SOS**: botão → contatos na hora; gatilho automático → pergunta "Tudo bem?" por 30 s → contatos → após 120 s, **central da GCM** (protocolo simulado). **Só o PIN cancela** (hash PBKDF2).
 - **Relatos**: entram com peso baixo (depende da reputação do autor) e ganham +0,15 por confirmação; expiram por tipo (crimes 6 h, alagamento 12 h, infraestrutura até o SP156 resolver); autor nunca é exposto; antiduplicidade (100 m / 30 min) e limite de spam (5 / 10 min); operador pode marcar como falso (reduz reputação).
 - **Segurança**: JWT, RBAC (`citizen` / `operator`), rate limit nos endpoints de auth, validação Pydantic, sem imagens nem biometria (câmeras = só posição).
 
 ## Como executar
 
-**Pré-requisitos:** Python 3.12+ (ou apenas Docker, na Opção B). Nenhuma configuração é obrigatória: os valores padrão funcionam. Para customizar, copie `.env.example` para `.env` (`DATABASE_URL`, `SECRET_KEY`, ...); o arquivo é lido automaticamente e variáveis de ambiente têm prioridade.
+**Pré-requisitos:** Python 3.12+ (ou Docker, na Opção B). A Opção A usa SQLite e não exige configuração; uma chave aleatória temporária é criada para a execução local. O Docker Compose exige `POSTGRES_PASSWORD` no `.env`.
 
 ### Opção A — um comando (SQLite, sem nada para configurar)
 
@@ -87,6 +88,8 @@ Abra **http://localhost:8000/docs**.
 
 ### Opção B — Docker + PostgreSQL (migrações também validadas em PostgreSQL 16)
 
+Antes de subir o banco, copie `.env.example` para `.env` e defina `POSTGRES_PASSWORD` com uma senha aleatória URL-safe (por exemplo, gere uma com `python -c "import secrets; print(secrets.token_urlsafe(24))"`). Em produção, configure também `APP_ENV=production`, `SECRET_KEY` aleatória e persistente com pelo menos 32 caracteres e `SEED_DEMO_USERS=false`. O PostgreSQL e a API do Compose ficam expostos somente em `127.0.0.1`.
+
 ```bash
 docker compose up --build
 ```
@@ -102,7 +105,10 @@ pip install pytest-cov && pytest --cov=app --cov-report=term-missing
 
 Versões exatas usadas nos testes: `requirements.lock.txt` (Python 3.11 ou mais novo; sem o `uvloop`, um acelerador opcional que não existe para Windows). Para qualquer outra versão do Python, use o `requirements.txt` (é o que o `run.sh` e o `run.bat` usam).
 
-### Usuários de demonstração (criados pelo seed)
+### Usuários de demonstração (somente desenvolvimento)
+
+O seed cria estas contas quando `SEED_DEMO_USERS=true` (padrão de desenvolvimento). Em produção, a opção é desativada por padrão e o processo falha se for habilitada.
+Em produção, contas de operador devem ser provisionadas por um fluxo administrativo controlado; `/auth/register` cria apenas cidadãos.
 
 | Perfil | E-mail | Senha |
 |---|---|---|
@@ -123,7 +129,7 @@ No Swagger: **Authorize** → `username` = e-mail, `password` = senha.
 | POST | `/routes/compare` | Rota rápida × segura, com motivos | cidadão |
 | GET | `/risk/score` | Score de risco de um ponto/horário | cidadão |
 | POST/GET | `/trips`, `/trips/{id}` | Inicia / consulta trajeto | cidadão |
-| POST | `/trips/{id}/locations` | Envia posição (detecta anomalia) | cidadão |
+| POST | `/trips/{id}/locations` | Registra posição, detecta anomalia e abre um SOS; retorna `sos_alert_id` e `sos_status` | cidadão |
 | POST | `/trips/{id}/complete` | Finaliza (check-in de chegada) | cidadão |
 | GET | `/public/track/{token}` | Página do contato (ao vivo) | público (token) |
 | POST/GET | `/reports` | Cria / lista relatos num raio | cidadão |
@@ -142,7 +148,7 @@ No Swagger: **Authorize** → `username` = e-mail, `password` = senha.
 |---|---|
 | `docs/evidencias/01_migracoes_e_seed.txt` | Migrações (downgrade base → upgrade head), seed e `alembic check` executados em **PostgreSQL 16 real**, com a listagem das 10 tabelas do domínio (+ `alembic_version`, controle do Alembic) |
 | `docs/evidencias/02_testes_pytest.txt` | Saída do `pytest -v`: 47 testes passando |
-| `docs/evidencias/03_fluxo_completo_http.txt` | Fluxo real via HTTP contra a API sobre PostgreSQL: cadastro → contato (pendente bloqueado, depois aceito) → relato confirmado por outro usuário → score → comparação de rotas → trajeto → link público → desvio → SOS (PIN errado/correto) → chegada → painel (403 para cidadão) |
+| `docs/evidencias/03_fluxo_completo_http.txt` | Snapshot histórico de fluxo HTTP com tokens redigidos. O script `docs/evidencias/fluxo_http.sh` foi atualizado para demonstrar a criação automática do SOS após uma anomalia; regenere o snapshot para capturar o novo campo `sos_alert_id`. |
 | `docs/evidencias/fluxo_http.sh` | Script que reproduz esse fluxo: `bash docs/evidencias/fluxo_http.sh` com a API no ar |
 | `docs/openapi.json` | Especificação OpenAPI gerada automaticamente |
 | `docs/prints/` | Prints da aplicação rodando (Swagger, comparação de rotas, SOS, painel da Prefeitura e os 47 testes) |
@@ -191,7 +197,7 @@ Dockerfile  docker-compose.yml  requirements.txt  requirements.lock.txt  alembic
 - **Integrações simuladas**: Smart Sampa, GCM e SP156 (protocolos fictícios gerados pela API).
 - **Consultas geográficas em Python** (haversine). Em produção: PostgreSQL + PostGIS com índice espacial.
 - **Rate limit em memória**: suficiente para uma instância; em produção usar Redis/API gateway.
-- **Escalada do SOS por tempo é calculada sob demanda** (ao consultar o alerta); em produção, um *worker* agendado dispararia as notificações reais (push/SMS).
-- **Chave JWT**: o valor padrão de `SECRET_KEY` é só para desenvolvimento. Em produção, defina `SECRET_KEY` (ver `.env.example`).
+- **Escalada do SOS por tempo é calculada sob demanda** (ao consultar o alerta); em produção, um *worker* agendado dispararia as notificações reais (push/SMS). A API abre o alerta a partir da anomalia, mas não envia push/SMS nem aciona a GCM real.
+- **Chave JWT**: em desenvolvimento, se `SECRET_KEY` estiver vazia, uma chave aleatória é gerada para o processo atual e os tokens deixam de valer após reiniciar. Em produção, configure uma chave aleatória persistente de pelo menos 32 caracteres; a aplicação falha ao iniciar se estiver ausente ou curta.
 - **Fusos**: horários recebidos com fuso (ex.: `-03:00`, `Z`) são convertidos para UTC; `depart_at` com fuso é convertido para o horário de São Paulo.
 - Nenhum dado pessoal real é usado.
